@@ -7,7 +7,7 @@ This is an example project to show how to include the integration tests in the g
 To run the project with integration tests run:
 
 ```bash
-$ ./gradlew clean integration-test
+$ ./gradlew clean build integrationTest
 ```
 
 ## Integration into build.gradle
@@ -61,7 +61,7 @@ liberty {
 
 The last step is the trigger configuration. We need to clarify if the integration tests should be run automatically
 after the test stage. Then we could configure it here. This will do some cleaning after running
-`gradle integration-test`.
+`gradle integrationTest`.
 ```groovy
 clean.dependsOn 'libertyStop'
 integrationTest.dependsOn 'libertyStart'
