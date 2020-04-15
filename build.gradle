@@ -1,0 +1,65 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'io.openliberty.tools:liberty-gradle-plugin:3.0'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+apply plugin: 'liberty'
+apply plugin: 'war'
+apply plugin: 'java'
+
+group = 'cwansart'
+version = '1.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    providedCompile 'javax:javaee-api:7.0'
+
+    libertyRuntime 'io.openliberty:openliberty-runtime:20.0.0.3'
+
+    testCompile 'io.rest-assured:rest-assured:4.2.0'
+    testCompile 'junit:junit:4.12'
+}
+
+ext {
+    appName = project.name
+    testServerHttpPort = 9080
+    testServerHttpsPort = 9443
+    warContext = appName
+}
+
+liberty {
+    server {
+        name = "${appName}Server"
+        configDirectory = file("src/main/liberty/config")
+        bootstrapProperties = ['default.http.port': testServerHttpPort,
+                               'default.https.port': testServerHttpsPort,
+                               'app.context.root': warContext]
+        packageLiberty {
+            packageName = "$buildDir/${appName}.zip"
+            include = "usr"
+        }
+    }
+}
+
+war {
+    archiveFileName = "gradle-liberty-plugin-for-integration-tests.war"
+}
+
+task integrationTest(type: Test) {
+    useJUnit()
+}
+
+clean.dependsOn 'libertyStop'
+integrationTest.dependsOn 'libertyStart'
+integrationTest.finalizedBy 'libertyStop'
+libertyPackage.dependsOn 'libertyStop'
